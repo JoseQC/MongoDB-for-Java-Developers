@@ -294,15 +294,15 @@ public class UsingAggregationBuilders extends AbstractLesson {
     The Aggregates.facet() method also takes variable set of Facet
     objects that composes the sub-pipelines of each facet element.
 
-    db.movies.aggregate([
-        { "$match" : { "countries" : "Portugal" } },
-        { "$facet" : {
-            "cast_members" : [{ "$unwind" : "$cast" }, { "$group" : { "_id" : "", "cast_list" : { "$addToSet" : "$cast" } } }],
-            "genres_count" : [{ "$unwind" : "$genres" }, { "$sortByCount" : "$genres" }],
-            "year_bucket" : [{ "$bucketAuto" : { "groupBy" : "$year", "buckets" : 10 } }]
-            }
-        }
-      ])
+      db.movies.aggregate([
+          { "$match" : { "countries" : "Portugal" } },
+          { "$facet" : {
+              "cast_members" : [{ "$unwind" : "$cast" }, { "$group" : { "_id" : "", "cast_list" : { "$addToSet" : "$cast" } } }],
+              "genres_count" : [{ "$unwind" : "$genres" }, { "$sortByCount" : "$genres" }],
+              "year_bucket" : [{ "$bucketAuto" : { "groupBy" : "$year", "buckets" : 10 } }]
+              }
+          }
+        ])
      */
 
     // $facets stage
