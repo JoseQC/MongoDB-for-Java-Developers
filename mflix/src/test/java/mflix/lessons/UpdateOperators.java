@@ -33,7 +33,7 @@ public class UpdateOperators extends AbstractLesson {
     super();
   }
 
-  /* First, we must set up a test collection and the documents that go in
+  /* First, we must set up a test collection and the documents th at go in
    * it. We are calling this collection "artists" and throwing Gorillaz and
    * Weird Al Yankovic in there for testing purposes.
    */
