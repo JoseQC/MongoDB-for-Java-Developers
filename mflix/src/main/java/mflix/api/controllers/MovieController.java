@@ -108,7 +108,7 @@ public class MovieController extends ApiController {
     @RequestMapping(value = "/facet-search", method = RequestMethod.GET)
     public ResponseEntity<Map> apiSearchMoviesFaceted(
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            @RequestParam(value = "cast", required = false) @Size(min = 1) ArrayList<String> cast) {
+                @RequestParam(value = "cast", required = false) @Size(min = 1) ArrayList<String> cast) {
 
         Map<String, List<String>> filters = new HashMap<>();
         filters.put("cast", cast);

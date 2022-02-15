@@ -33,7 +33,8 @@ public class UserDao extends AbstractMFlixDao {
     private final MongoCollection<User> usersCollection;
     //TODO> Ticket: User Management - do the necessary changes so that the sessions collection
     //returns a Session object
-    private final MongoCollection<Document> sessionsCollection;
+    private final MongoCollection<Session> sessionsCollection;
+    //private final MongoCollection<Document> sessionsCollection;
 
     private final Logger log;
 
@@ -48,9 +49,7 @@ public class UserDao extends AbstractMFlixDao {
 
         usersCollection = db.getCollection("users", User.class).withCodecRegistry(pojoCodecRegistry);
         log = LoggerFactory.getLogger(this.getClass());
-        //TODO> Ticket: User Management - implement the necessary changes so that the sessions
-        // collection returns a Session objects instead of Document objects.
-        sessionsCollection = db.getCollection("sessions");
+        sessionsCollection = db.getCollection("sessions", Session.class).withCodecRegistry(pojoCodecRegistry);
     }
 
     /**
@@ -61,8 +60,13 @@ public class UserDao extends AbstractMFlixDao {
      */
     public boolean addUser(User user) {
         //TODO > Ticket: Durable Writes -  you might want to use a more durable write concern here!
+<<<<<<< HEAD
         //usersCollection.insertOne(user);
         //return true;
+=======
+        usersCollection.withWriteConcern(WriteConcern.MAJORITY).insertOne(user);
+        return true;
+>>>>>>> 9fcc99fd8e1ee1d2a021eb81aaccf349bc339b94
         //TODO > Ticket: Handling Errors - make sure to only add new users
         // and not users that already exist.
         try {
@@ -88,7 +92,15 @@ public class UserDao extends AbstractMFlixDao {
     public boolean createUserSession(String userId, String jwt) {
         //TODO> Ticket: User Management - implement the method that allows session information to be
         // stored in it's designated collection.
+<<<<<<< HEAD
        // return false;
+=======
+        Bson updateFilter = new Document("user_id", userId);
+        Bson setUpdate = Updates.set("jwt", jwt);
+        UpdateOptions options = new UpdateOptions().upsert(true);
+        sessionsCollection.updateOne(updateFilter, setUpdate, options);
+        return true;
+>>>>>>> 9fcc99fd8e1ee1d2a021eb81aaccf349bc339b94
         //TODO > Ticket: Handling Errors - implement a safeguard against
         // creating a session with the same jwt token.
         try{
@@ -112,9 +124,9 @@ public class UserDao extends AbstractMFlixDao {
      * @return User object or null.
      */
     public User getUser(String email) {
-        User user = null;
         //TODO> Ticket: User Management - implement the query that returns the first User object.
-        return user;
+        return usersCollection.find(new Document("email", email)).limit(1).first();
+
     }
 
     /**
@@ -126,12 +138,18 @@ public class UserDao extends AbstractMFlixDao {
     public Session getUserSession(String userId) {
         //TODO> Ticket: User Management - implement the method that returns Sessions for a given
         // userId
-        return null;
+        return sessionsCollection.find(new Document("user_id", userId)).limit(1).first();
     }
 
     public boolean deleteUserSessions(String userId) {
         //TODO> Ticket: User Management - implement the delete user sessions method
-        return false;
+        Document sessionDeleteFilter = new Document("user_id", userId);
+        DeleteResult res = sessionsCollection.deleteOne(sessionDeleteFilter);
+        if (res.getDeletedCount() < 1) {
+            log.warn("User `{}` could not be found in sessions collection.", userId);
+        }
+
+        return res.wasAcknowledged();
     }
 
     /**
@@ -145,6 +163,7 @@ public class UserDao extends AbstractMFlixDao {
         //TODO> Ticket: User Management - implement the delete user method
         //TODO > Ticket: Handling Errors - make this method more robust by
         // handling potential exceptions.
+<<<<<<< HEAD
        // return false;
         // remove user sessions
         try {
@@ -165,6 +184,17 @@ public class UserDao extends AbstractMFlixDao {
                     e.getMessage());
             throw new IncorrectDaoOperation(errorMessage);
 
+=======
+        if (deleteUserSessions(email)) {
+            Document userDeleteFilter = new Document("email", email);
+            DeleteResult res = usersCollection.deleteOne(userDeleteFilter);
+
+            if (res.getDeletedCount() < 0) {
+                log.warn("User with `email` {} not found. Potential concurrent operation?!");
+            }
+
+            return res.wasAcknowledged();
+>>>>>>> 9fcc99fd8e1ee1d2a021eb81aaccf349bc339b94
         }
         return false;
     }
@@ -182,14 +212,22 @@ public class UserDao extends AbstractMFlixDao {
         // be updated.
         //TODO > Ticket: Handling Errors - make this method more robust by
         // handling potential exceptions when updating an entry.
+<<<<<<< HEAD
         //return false;
         // make sure to check if userPreferences are not null. If null, return false immediately.
         if (userPreferences == null) {
             throw new IncorrectDaoOperation("userPreferences cannot be set to null");
+=======
+        // make sure to check if userPreferences are not null. If null, return false immediately.
+        if(userPreferences == null){
+            throw new IncorrectDaoOperation(
+                    "userPreferences cannot be set to null");
+>>>>>>> 9fcc99fd8e1ee1d2a021eb81aaccf349bc339b94
         }
         // create query filter and update object.
         Bson updateFilter = new Document("email", email);
         Bson updateObject = Updates.set("preferences", userPreferences);
+<<<<<<< HEAD
         try {
             // update one document matching email.
             UpdateResult res = usersCollection.updateOne(updateFilter, updateObject);
@@ -206,5 +244,15 @@ public class UserDao extends AbstractMFlixDao {
                             "Issue caught while trying to update user `{}`: {}", email, e.getMessage());
             throw new IncorrectDaoOperation(errorMessage);
         }
+=======
+        // update one document matching email.
+        UpdateResult res = usersCollection.updateOne(updateFilter, updateObject);
+        if(res.getModifiedCount() < 1){
+            log.warn("User `{}` was not updated. Trying to re-write the same `preferences` field: `{}`",
+                    email, userPreferences);
+        }
+        return true;
+
+>>>>>>> 9fcc99fd8e1ee1d2a021eb81aaccf349bc339b94
     }
 }
