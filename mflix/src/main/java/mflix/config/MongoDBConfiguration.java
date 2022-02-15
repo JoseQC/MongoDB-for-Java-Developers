@@ -29,5 +29,20 @@ public class MongoDBConfiguration {
         MongoClient mongoClient = MongoClients.create(connectionString);
 
         return mongoClient;
+/*
+        this.connectionString = new ConnectionString(connectionString);
+
+        WriteConcern wc = WriteConcern.MAJORITY.withWTimeout(2500,
+                TimeUnit.MILLISECONDS);
+        MongoClientSettings settings =
+                MongoClientSettings.builder()
+                        .applyConnectionString(this.connectionString)
+                        .writeConcern(wc)
+                        .build();
+        mongoClient = MongoClients.create(settings);
+
+        return mongoClient;
+      */
+
     }
 }
