@@ -81,7 +81,6 @@ public class CommentDao extends AbstractMFlixDao {
         // comment.
         // TODO> Ticket - Handling Errors: Implement a try catch block to
         // handle a potential write exception when given a wrong commentId.
-<<<<<<< HEAD
         //return null;
 
         if (comment.getId() == null || comment.getId().isEmpty()) {
@@ -97,13 +96,6 @@ public class CommentDao extends AbstractMFlixDao {
                             "Error occurred while adding a new Comment `{}`: {}", comment, e.getMessage());
             throw new IncorrectDaoOperation(errorMessage);
         }
-=======
-        if ( comment.getId()==null || comment.getId().isEmpty()) {
-            throw new IncorrectDaoOperation("Comment objects need to have an id field set.");
-        }
-        commentCollection.insertOne(comment);
-        return comment;
->>>>>>> 9fcc99fd8e1ee1d2a021eb81aaccf349bc339b94
     }
 
     /**
@@ -125,7 +117,6 @@ public class CommentDao extends AbstractMFlixDao {
         // user own comments
         // TODO> Ticket - Handling Errors: Implement a try catch block to
         // handle a potential write exception when given a wrong commentId.
-<<<<<<< HEAD
         //return false;
         Bson filter =
                 Filters.and(Filters.eq("email", email), Filters.eq("_id", new ObjectId(commentId)));
@@ -154,26 +145,6 @@ public class CommentDao extends AbstractMFlixDao {
                             "Error occurred while updating comment `{}`: {}", commentId, e.getMessage());
             throw new IncorrectDaoOperation(messageError);
         }
-=======
-        Bson filter = Filters.and(
-                Filters.eq("email", email),
-                Filters.eq("_id", new ObjectId(commentId)));
-        Bson update = Updates.combine(Updates.set("text", text),
-                Updates.set("date", new Date())) ;
-        UpdateResult res = commentCollection.updateOne(filter, update);
-
-        if(res.getMatchedCount() > 0){
-
-            if (res.getModifiedCount() != 1){
-                log.warn("Comment `{}` text was not updated. Is it the same text?");
-            }
-
-            return true;
-        }
-        log.error("Could not update comment `{}`. Make sure the comment is owned by `{}`",
-                commentId, email);
-        return false;
->>>>>>> 9fcc99fd8e1ee1d2a021eb81aaccf349bc339b94
     }
 
     /**
